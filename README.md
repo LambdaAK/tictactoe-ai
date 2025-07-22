@@ -1,4 +1,4 @@
-# Tic-Tac-Toe AI Experimentation Repository
+# Tic-Tac-Toe AI
 
 This repository is dedicated to experimenting with various AI algorithms for playing Tic-Tac-Toe. Currently, a **Q-Learning** implementation has been developed using tabular methods.
 
@@ -26,14 +26,19 @@ Q-Learning is a model-free reinforcement learning algorithm that learns the qual
 2. **Learning Process**:
    - Agent explores the environment using ε-greedy strategy
    - Updates Q-values using the Bellman equation:
+
+
      ```math
-     Q(s,a) ← Q(s,a) + α[r + γ max Q(s',a') - Q(s,a)]
+     Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s',a') - Q(s,a) \right]
      ```
-   - Where:
-     - α (alpha) = learning rate
-     - γ (gamma) = discount factor
-     - r = immediate reward
-     - s' = next state
+
+
+   - Where:  
+     - $\alpha$ (alpha) = learning rate  
+     - $\gamma$ (gamma) = discount factor  
+     - $r$ = immediate reward  
+     - $s'$ = next state
+
 
 3. **Training Strategy**:
    - **Exploration**: Random moves with probability ε (epsilon)
