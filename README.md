@@ -28,9 +28,9 @@ Q-Learning is a model-free reinforcement learning algorithm that learns the qual
    - Updates Q-values using the Bellman equation:
 
 
-     ```math
-     Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s',a') - Q(s,a) \right]
-     ```
+```math
+Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s',a') - Q(s,a) \right]
+```
 
 
    - Where:  
