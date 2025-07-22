@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import sys
 import os
+from collections import defaultdict
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,10 +16,15 @@ from qlearning_agent import QLearningAgent, random_agent
 
 def train_q_learning_agent(episodes: int = 50000):
     game = TicTacToe()
+    
+    # Create agents with unique names and metadata
     agent1 = QLearningAgent(player=1, learning_rate=0.1, discount_factor=0.95, 
                            epsilon=0.8, epsilon_decay=0.9995, epsilon_min=0.01)
+    agent1.name = "X_Agent"  # Player 1 is X
+    
     agent2 = QLearningAgent(player=2, learning_rate=0.1, discount_factor=0.95, 
                            epsilon=0.8, epsilon_decay=0.9995, epsilon_min=0.01)
+    agent2.name = "O_Agent"  # Player 2 is O
     
     wins = {1: 0, 2: 0, 0: 0}
     
@@ -69,17 +75,89 @@ def train_q_learning_agent(episodes: int = 50000):
             win_rate_1 = wins[1] / (episode + 1) * 100
             win_rate_2 = wins[2] / (episode + 1) * 100
             draw_rate = wins[0] / (episode + 1) * 100
-            print(f"Episode {episode}: Agent1 wins: {win_rate_1:.1f}%, Agent2 wins: {win_rate_2:.1f}%, Draws: {draw_rate:.1f}%")
-            print(f"Epsilon - Agent1: {agent1.get_epsilon():.4f}, Agent2: {agent2.get_epsilon():.4f}")
+            print(f"Episode {episode}: {agent1.name} wins: {win_rate_1:.1f}%, {agent2.name} wins: {win_rate_2:.1f}%, Draws: {draw_rate:.1f}%")
+            print(f"Epsilon - {agent1.name}: {agent1.get_epsilon():.4f}, {agent2.name}: {agent2.get_epsilon():.4f}")
     
     print(f"\nTraining completed!")
-    print(f"Final stats - Agent1 wins: {wins[1]}, Agent2 wins: {wins[2]}, Draws: {wins[0]}")
-    print(f"Final epsilon - Agent1: {agent1.get_epsilon():.4f}, Agent2: {agent2.get_epsilon():.4f}")
+    print(f"Final stats - {agent1.name} wins: {wins[1]}, {agent2.name} wins: {wins[2]}, Draws: {wins[0]}")
+    print(f"Final epsilon - {agent1.name}: {agent1.get_epsilon():.4f}, {agent2.name}: {agent2.get_epsilon():.4f}")
     
-    agent1.save_q_table("agent1_qtable.pkl")
-    agent2.save_q_table("agent2_qtable.pkl")
+    # Save agents with metadata
+    save_agent_with_metadata(agent1, episodes)
+    save_agent_with_metadata(agent2, episodes)
     
     return agent1, agent2
+
+def save_agent_with_metadata(agent: QLearningAgent, episodes: int):
+    """Save agent with metadata including training parameters and statistics"""
+    import pickle
+    from datetime import datetime
+    
+    # Create agents directory if it doesn't exist
+    agents_dir = "agents"
+    os.makedirs(agents_dir, exist_ok=True)
+    
+    metadata = {
+        'name': agent.name,
+        'player': agent.player,
+        'training_episodes': episodes,
+        'learning_rate': agent.learning_rate,
+        'discount_factor': agent.discount_factor,
+        'initial_epsilon': agent.initial_epsilon,
+        'epsilon_decay': agent.epsilon_decay,
+        'epsilon_min': agent.epsilon_min,
+        'final_epsilon': agent.get_epsilon(),
+        'training_date': datetime.now().isoformat(),
+        'q_table': {state: dict(actions) for state, actions in agent.q_table.items()}
+    }
+    
+    filename = f"{agent.name.lower()}_qtable.pkl"
+    filepath = os.path.join(agents_dir, filename)
+    
+    with open(filepath, 'wb') as f:
+        pickle.dump(metadata, f)
+    
+    print(f"Saved {agent.name} to {filepath}")
+
+def load_agent_with_metadata(filename: str) -> QLearningAgent:
+    """Load agent with metadata from file"""
+    import pickle
+    
+    with open(filename, 'rb') as f:
+        metadata = pickle.load(f)
+    
+    # Create agent with loaded parameters
+    agent = QLearningAgent(
+        player=metadata['player'],
+        learning_rate=metadata['learning_rate'],
+        discount_factor=metadata['discount_factor'],
+        epsilon=metadata['final_epsilon'],
+        epsilon_decay=metadata['epsilon_decay'],
+        epsilon_min=metadata['epsilon_min']
+    )
+    
+    # Restore name and q_table
+    agent.name = metadata['name']
+    agent.q_table = defaultdict(lambda: defaultdict(float))
+    for state, actions in metadata['q_table'].items():
+        for action, q_value in actions.items():
+            agent.q_table[state][action] = q_value
+    
+    print(f"Loaded {agent.name} from {filename}")
+    print(f"Training info: {metadata['training_episodes']} episodes, trained on {metadata['training_date']}")
+    
+    return agent
+
+def load_agent_by_name(agent_name: str) -> QLearningAgent:
+    """Load agent by name from the agents directory"""
+    agents_dir = "agents"
+    filename = f"{agent_name.lower()}_qtable.pkl"
+    filepath = os.path.join(agents_dir, filename)
+    
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"Agent file not found: {filepath}")
+    
+    return load_agent_with_metadata(filepath)
 
 def test_against_random(agent: QLearningAgent, games: int = 1000):
     game = TicTacToe()
@@ -104,8 +182,8 @@ def test_against_random(agent: QLearningAgent, games: int = 1000):
     opponent_wins = wins[3 - agent.player]
     draws = wins[0]
     
-    print(f"Against random opponent ({games} games):")
-    print(f"Agent wins: {agent_wins} ({agent_wins/games*100:.1f}%)")
+    print(f"{agent.name} against random opponent ({games} games):")
+    print(f"{agent.name} wins: {agent_wins} ({agent_wins/games*100:.1f}%)")
     print(f"Random wins: {opponent_wins} ({opponent_wins/games*100:.1f}%)")
     print(f"Draws: {draws} ({draws/games*100:.1f}%)")
 

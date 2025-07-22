@@ -10,11 +10,16 @@ except ImportError:
     from ..tictactoe import TicTacToe
 
 from qlearning_agent import QLearningAgent
+from train_agent import load_agent_by_name
 
 def play_human_vs_agent():
     game = TicTacToe()
-    agent = QLearningAgent(player=2)
-    agent.load_q_table("agent2_qtable.pkl")
+    
+    try:
+        agent = load_agent_by_name("O_Agent")
+    except FileNotFoundError:
+        print("Error: O_Agent not found. Please train the agents first using train_agent.py")
+        return
     
     print("Welcome to Tic-Tac-Toe!")
     print("You are X (player 1), AI is O (player 2)")
@@ -42,7 +47,7 @@ def play_human_vs_agent():
                     print("Please enter a number 0-8.")
         else:
             action = agent.get_action(state, valid_actions, training=False)
-            print(f"AI chooses position {action}")
+            print(f"AI ({agent.name}) chooses position {action}")
         
         state, reward, done = game.make_move(action)
         game.display()
@@ -56,11 +61,13 @@ def play_human_vs_agent():
 
 def play_agent_vs_agent():
     game = TicTacToe()
-    agent1 = QLearningAgent(player=1)
-    agent2 = QLearningAgent(player=2)
     
-    agent1.load_q_table("agent1_qtable.pkl")
-    agent2.load_q_table("agent2_qtable.pkl")
+    try:
+        agent1 = load_agent_by_name("X_Agent")
+        agent2 = load_agent_by_name("O_Agent")
+    except FileNotFoundError as e:
+        print(f"Error: {e}. Please train the agents first using train_agent.py")
+        return
     
     print("Agent vs Agent gameplay:")
     state = game.reset()
@@ -71,10 +78,10 @@ def play_agent_vs_agent():
         
         if game.current_player == 1:
             action = agent1.get_action(state, valid_actions, training=False)
-            print(f"Agent 1 (X) chooses position {action}")
+            print(f"{agent1.name} (X) chooses position {action}")
         else:
             action = agent2.get_action(state, valid_actions, training=False)
-            print(f"Agent 2 (O) chooses position {action}")
+            print(f"{agent2.name} (O) chooses position {action}")
         
         state, reward, done = game.make_move(action)
         game.display()
@@ -83,9 +90,9 @@ def play_agent_vs_agent():
             input("Press Enter to continue...")
     
     if game.winner == 1:
-        print("Agent 1 (X) wins!")
+        print(f"{agent1.name} (X) wins!")
     elif game.winner == 2:
-        print("Agent 2 (O) wins!")
+        print(f"{agent2.name} (O) wins!")
     else:
         print("It's a draw!")
 
