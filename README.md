@@ -16,6 +16,58 @@ Tic-Tac-Toe serves as an excellent testbed for reinforcement learning algorithms
 
 Q-Learning is a model-free reinforcement learning algorithm that learns the quality of actions, telling an agent what action to take under what circumstances. It does not require a model of the environment and can handle problems with stochastic transitions and rewards.
 
+### The Reinforcement Learning Problem
+
+In reinforcement learning, an agent interacts with an environment to learn optimal behavior through trial and error. For Tic-Tac-Toe, we define:
+
+#### Core Elements
+- **State (s)**: The current board configuration (e.g., `"X.O.X.O.."`)
+- **Action (a)**: A valid move (0-8, representing board positions)
+- **Reward (r)**: Immediate feedback (+10 for win, -10 for loss, 0 for draw/continue)
+- **Policy ($\pi$)**: A function that maps states to actions: $\pi(s) \rightarrow a$
+- **Value Function V(s)**: Expected cumulative reward from state s following policy $\pi$
+- **Q-Function Q(s,a)**: Expected cumulative reward from taking action a in state s, then following policy $\pi$
+
+#### Mathematical Definitions
+
+**Value Function:**
+```math
+V^\pi(s) = \mathbb{E}_\pi \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s \right]
+```
+
+**Q-Function:**
+```math
+Q^\pi(s,a) = \mathbb{E}_\pi \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s, a_t = a \right]
+```
+
+**Optimal Q-Function:**
+```math
+Q^*(s,a) = \max_\pi Q^\pi(s,a)
+```
+
+#### Policy Derivation from Q-Function
+
+The optimal policy $\pi^*$ can be derived from the optimal Q-function:
+
+```math
+\pi^*(s) = \arg\max_a Q^*(s,a)
+```
+
+This means: "In state s, choose the action that maximizes the Q-value."
+
+#### Q-Learning: Approximating the Optimal Q-Function
+
+Since we don't know the optimal Q-function initially, we approximate it iteratively using the Bellman equation:
+
+```math
+Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s',a') - Q(s,a) \right]
+```
+
+**Key Insights:**
+- **Exploration vs Exploitation**: During training, we use ε-greedy policy: choose random action with probability ε, otherwise choose argmax Q(s,a)
+- **Temporal Difference Learning**: We update Q-values based on the difference between current estimate and the "target" ($r + \gamma \max Q(s',a')$)
+- **Convergence**: Under certain conditions, Q-values converge to the optimal Q-function
+
 ### How Q-Learning Works
 
 1. **Q-Table**: A lookup table that stores Q-values for each state-action pair
@@ -48,8 +100,8 @@ Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s',a') - Q(s,a) 
 ### Implementation Details
 
 #### Hyperparameters
-- **Learning Rate (α)**: 0.1 - Controls how much new information overrides old information
-- **Discount Factor (γ)**: 0.95 - How much future rewards are valued vs immediate rewards
+- **Learning Rate ($\alpha$)**: 0.1 - Controls how much new information overrides old information
+- **Discount Factor ($\gamma$)**: 0.95 - How much future rewards are valued vs immediate rewards
 - **Initial Epsilon**: 0.8 - Starting exploration rate
 - **Epsilon Decay**: 0.9995 - Rate at which exploration decreases
 - **Epsilon Minimum**: 0.01 - Minimum exploration rate
