@@ -32,12 +32,12 @@ In reinforcement learning, an agent interacts with an environment to learn optim
 
 **Value Function:**
 ```math
-V^\pi(s) = \mathbb{E}_\pi \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s \right]
+V^\pi(s) = \mathbb{E} \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s \right]
 ```
 
 **Q-Function:**
 ```math
-Q^\pi(s,a) = \mathbb{E}_\pi \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s, a_t = a \right]
+Q^\pi(s,a) = \mathbb{E} \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s, a_t = a \right]
 ```
 
 **Optimal Q-Function:**
