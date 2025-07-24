@@ -1,0 +1,17 @@
+{
+  "total_games": 1000,
+  "wins": 975,
+  "draws": 0,
+  "losses": 25,
+  "win_rate": 0.975,
+  "draw_rate": 0.0,
+  "loss_rate": 0.025,
+  "avg_game_length": 5.263,
+  "avg_decision_time": 0.032719160586299326,
+  "total_time": 102.13764929771423,
+  "avg_time_per_game": 0.10213764929771424,
+  "mcts_parameters": {
+    "iterations": 1000,
+    "exploration_constant": 1.414
+  }
+}
